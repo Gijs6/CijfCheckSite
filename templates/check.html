@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CijferCheck</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='cijfer.ico') }}">
+    </head>
+    <body class="cijfer">
+        <canvas id="canvas"></canvas>
+        <div class="bovenrij">
+            <div class="text-block">
+                <h1 id="subject">{{ data.subject }}</h1>
+                <h2 id="test-name">{{ data.test_name }}</h2>
+            </div>
+            <div class="score-block">
+                <h1 id="score">{{ data.score }}</h1>
+            </div>
+        </div>
+        <div class="onderrij">
+            <div class="date-block">
+                <h2 id="datetimekop">Toegevoegd op</h2>
+                <h3 id="date-timeAB">{{ data.date }} om {{ data.time }}</h3>
+            </div>
+            <div class="average-block">
+                <h3 id="infotekst">Nieuw rapportcijfer voor <span id="vakbenadruk">{{ data.subject }}</span></h3>
+                <h2 id="average">{{ data.new_average }}</h2>
+            </div>
+        </div>
+        <audio id="end-sound" src="{{ url_for('static', filename='standaard.mp3') }}"></audio>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('js-enabled');
+                const scoreElement = document.getElementById('score');
+
+                scoreElement.textContent = "???"
+
+                const textBlock = document.querySelector('.text-block');
+                const scoreBlock = document.querySelector('.score-block');
+                const dateBlock = document.querySelector('.date-block');
+                const averageBlock = document.querySelector('.average-block');
+
+                const endSound = document.getElementById('end-sound');
+                const subject = "{{ subject }}";
+
+                const headerContainer = document.querySelectorAll('.containerBoven')[0];
+                const lowerBlocks = document.querySelectorAll('.containerOnder')[0];
+
+                window.addEventListener('scroll', () => {
+                    const scrollPosition = window.scrollY;
+                    if (scrollPosition > 100) {
+                        headerContainer.classList.add('sticky');
+                        lowerBlocks.style.display = 'none';
+                    } else {
+                        headerContainer.classList.remove('sticky');
+                        lowerBlocks.style.display = 'flex';
+                    }
+                });
+
+
+                // Source: https://codepen.io/jonathanbell/pen/OvYVYw
+
+                function confetti(hoeveelheid) {
+                    let W = window.innerWidth;
+                    let H = window.innerHeight;
+                    const canvas = document.getElementById("canvas");
+                    const context = canvas.getContext("2d");
+                    const maxConfettis = hoeveelheid;
+                    const particles = [];
+
+                    const possibleColors = [
+                        "DodgerBlue",
+                        "OliveDrab",
+                        "Gold",
+                        "Pink",
+                        "SlateBlue",
+                        "LightBlue",
+                        "Gold",
+                        "Violet",
+                        "PaleGreen",
+                        "SteelBlue",
+                        "SandyBrown",
+                        "Chocolate",
+                        "Crimson"
+                    ];
+
+                    function randomFromTo(from, to) {
+                        return Math.floor(Math.random() * (to - from + 1) + from);
+                    }
+
+                    function confettiParticle() {
+                        this.x = Math.random() * W;
+                        this.y = Math.random() * H - H;
+                        this.r = randomFromTo(11, 33);
+                        this.d = Math.random() * maxConfettis + 11;
+                        this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+                        this.tilt = Math.floor(Math.random() * 33) - 11;
+                        this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
+                        this.tiltAngle = 0;
+
+                        this.draw = function() {
+                            context.beginPath();
+                            context.lineWidth = this.r / 2;
+                            context.strokeStyle = this.color;
+                            context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                            context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                            return context.stroke();
+                        };
+                    }
+
+                    function Draw() {
+                        const results = [];
+
+                        requestAnimationFrame(Draw);
+
+                        context.clearRect(0, 0, W, window.innerHeight);
+
+                        for (var i = 0; i < maxConfettis; i++) {
+                            results.push(particles[i].draw());
+                        }
+
+                        let particle = {};
+                        let remainingFlakes = 0;
+                        for (var i = 0; i < maxConfettis; i++) {
+                            particle = particles[i];
+
+                            particle.tiltAngle += particle.tiltAngleIncremental;
+                            particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
+                            particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
+
+                            if (particle.y <= H) remainingFlakes++;
+
+                            if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
+                                particle.x = Math.random() * W;
+                                particle.y = -30;
+                                particle.tilt = Math.floor(Math.random() * 10) - 20;
+                            }
+                        }
+
+                        return results;
+                    }
+
+                    window.addEventListener(
+                        "resize",
+                        function() {
+                            W = window.innerWidth;
+                            H = window.innerHeight;
+                            canvas.width = window.innerWidth;
+                            canvas.height = window.innerHeight;
+                        },
+                        false
+                    );
+
+                    for (var i = 0; i < maxConfettis; i++) {
+                        particles.push(new confettiParticle());
+                    }
+
+                    canvas.width = W;
+                    canvas.height = H;
+                    Draw();
+                }
+
+
+                setTimeout(() => {
+                    textBlock.classList.add('fade-in');
+                    scoreBlock.classList.add('fade-in');
+                    dateBlock.classList.add('fade-in');
+                }, 500);
+
+
+
+                function playTone(freq) {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    oscillator.connect(audioCtx.destination);
+                    oscillator.start();
+                    setTimeout(() => oscillator.stop(), 50);
+                }
+
+                const targetScore = parseFloat("{{ score }}");
+                let currentScore = 0.9;
+                let currentScoreAfr = 1.0;
+                let animationSpeed = 35;
+                let speedIncreased = false;
+                let clickCount = 0;
+                let clickTimer;
+
+                function animateScore() {
+                    if (isNaN(targetScore)) {
+
+                        scoreElement.textContent = "{{ score }}";
+                        endSound.play();
+
+                        setTimeout(() => {
+                            averageBlock.classList.add('fade-in');
+                        }, 100);
+                    } else if (currentScore < targetScore) {
+                        currentScore += 0.05;
+                        scoreElement.textContent = currentScore.toFixed(1);
+                        let currentScoreAfr = Math.round(currentScore * 1000) / 1000;
+                        if (currentScoreAfr % 1 === 0) {
+                            playTone((currentScoreAfr * 100));
+                        }
+
+                        setTimeout(animateScore, animationSpeed);
+                    } else {
+                        scoreElement.textContent = targetScore.toFixed(1);
+
+                        let roundedScore = Math.round(targetScore);
+
+                        if (roundedScore === 6) {
+                            endSound.src = "{{ url_for('static', filename='cijfer6.mp3') }}";
+                        } else if (roundedScore === 7) {
+                            endSound.src = "{{ url_for('static', filename='cijfer7.mp3') }}";
+                        } else if (roundedScore === 8) {
+                            endSound.src = "{{ url_for('static', filename='cijfer8.mp3') }}";
+                            confetti(25);
+                        } else if (roundedScore === 9) {
+                            endSound.src = "{{ url_for('static', filename='cijfer9.mp3') }}";                                confetti(200);
+                        } else if (roundedScore === 10) {
+                            endSound.src = "{{ url_for('static', filename='cijfer10.mp3') }}";
+                            confetti(750);
+                        }
+
+                        endSound.play();
+
+                        setTimeout(() => {
+                            averageBlock.classList.add('fade-in');
+                        }, 100);
+                    }
+                }
+
+
+                document.body.addEventListener('click', () => {
+                    clickCount++;
+
+                    if (clickCount === 2) {
+                        animationSpeed = 10;
+                        speedIncreased = true;
+                    }
+
+                    clearTimeout(clickTimer);
+                    clickTimer = setTimeout(() => {
+                        clickCount = 0;
+                    }, 500);
+                });
+
+                setTimeout(() => {
+                    animateScore();
+                }, 1750);
+            });
+        </script>
+    </body>
+</html>

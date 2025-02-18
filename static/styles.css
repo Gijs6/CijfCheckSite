@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+:root {
+    --zwart: #0f212e;
+    --witblauw: #d1e3f0;
+    --wit: #eaf2ef;
+    --grijs: #6b6d76;
+    --dblauw: #28587b;
+    --lblauw: #0f95b0;
+    --geel: #ffa630;
+    --rood: #e65039;
+    --groen: #06c749
+}
+
+
+body {
+    background-color: var(--zwart);
+    background-image: url("/static/achtergrond.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--witblauw);
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+body.cijfer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow-y: auto;
+    gap: 5vw;
+    hyphens: auto;
+}
+
+body.top-aligned {
+    display: block;
+    padding-top: 2.5vw;
+    padding-bottom: 5vw;
+    margin: auto
+}
+
+.bovenrij,
+.onderrij {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 5vw;
+    width: 80vw;
+    margin: 0 auto;
+}
+
+.text-block,
+.score-block,
+.date-block,
+.average-block {
+    background-color: var(--dblauw);
+    border-radius: 3vw;
+    padding: 3vw;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    transition: opacity 1s ease, transform 1s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.text-block, .score-block, .date-block, .average-block {
+    flex: 1 1 auto;
+}
+
+.text-block, .average-block, .date-block {
+    align-items: right;
+    max-width: calc(80vw - 10px);
+}
+
+.score-block {
+    align-items: center;
+    max-width: fit-content;
+}
+
+.date-block {
+    max-width: 25vw;
+}
+
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+
+h1,
+h2,
+h3 {
+    margin: 0;
+}
+
+p {
+    margin: 1px;
+    font-weight: 300;
+    font-size: clamp(12px, 1.5vw, 25px);
+}
+
+
+#subject {
+    font-size: clamp(30px, 4vw, 60px);
+    margin-bottom: 5px;
+    font-weight: 900;
+}
+
+#test-name {
+    font-size: clamp(20px, 2.5vw, 40px);
+    font-weight: 500;
+}
+
+#score {
+    font-size: clamp(55px, 12vw, 120px);
+    font-family: 'JetBrains Mono', mono;
+    font-weight: 900;
+}
+
+#datetimekop {
+    font-size: clamp(15px, 2vw, 40px);
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+#date-timeAB {
+    font-size: clamp(15px, 2vw, 40px);
+    margin-bottom: 5px;
+    font-weight: 300;
+}
+
+#infotekst {
+    font-size: clamp(15px, 2vw, 40px);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+#vakbenadruk {
+    font-weight: 900;
+}
+
+#average {
+    font-size: clamp(20px, 5vw, 45px);
+    font-family: 'JetBrains Mono', mono;
+    font-weight: 900;
+}
+
+
+.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+@media (max-width: 1000px) {
+    .score-block {
+        max-width: none;
+    }
+
+    .bovenrij {
+        flex-direction: column;
+        gap: 2vw;
+    }
+
+    .onderrij {
+        gap: 2vw;
+    }
+
+    body.cijfer {
+        gap: 2vw;
+    }
+}
+
+
+
+@media (max-width: 400px) {
+    canvas {
+        display: none;
+    }
+}
+
